@@ -36,7 +36,7 @@
     <script src="popup.js"></script>
   </head>
 
-  <body>
+  <body style ="height: 500px; width: 500px">
     <h1>CEP Gym</h1>
     <div id="loader" style = "display:none">
         <img src="91.gif">
@@ -49,6 +49,11 @@
     </div>
     <div id="connected" class="container" style = "display:none" >
       <p>Vous êtes connecté !</p>
+      <select id="member-select" >
+        <option placeholder>Selectionnez un gymnaste.</option>
+      </select>
     </div>
+
+    <script src="jquery-3.3.1.min.js"></script>
   </body>
 </html>
