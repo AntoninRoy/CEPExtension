@@ -1,3 +1,27 @@
+const DEV = true;
+if(document.getElementById("btn_save_close") != undefined){
+    document.getElementById("btn_save_close").addEventListener("click", function (){
+        if(document.getElementById("acteur-form").checkValidity()){
+            console.log("VALID");
+            if(localStorage.getItem('actual_user') != null){
+                chrome.runtime.sendMessage("nojbendfnanjkehmdfghipgalnikmokk",localStorage.getItem('actual_user'));
+                localStorage.setItem('actual_user', null);
+
+            }
+        }else{
+            console.log("NON VALIDE");
+            if(DEV){
+                if(localStorage.getItem('actual_user') != null){
+                    chrome.runtime.sendMessage("nojbendfnanjkehmdfghipgalnikmokk",localStorage.getItem('actual_user'));
+                    localStorage.setItem('actual_user', null);
+                }
+            }
+        }
+            
+        }, false);
+}
+
+
 chrome.runtime.onMessage.addListener(async function(data, sender, sendResponse) {
     console.log("chrome.runtime.onMessage: "+data.command);
     switch(data.command) {
@@ -9,12 +33,12 @@ chrome.runtime.onMessage.addListener(async function(data, sender, sendResponse) 
             });
             break; 
         case "paste_licence_holder" :
-           await getVilles();
+           localStorage.setItem('actual_user', JSON.stringify(data.user));
+
            inject(data);
-
-
            sendResponse({
-            response: "Adhérent copié avec succès."
+                status: "ok",
+                response: "Adhérent copié avec succès."
             });
     
             break;
@@ -25,35 +49,6 @@ chrome.runtime.onMessage.addListener(async function(data, sender, sendResponse) 
             });
     }
 });
-
-function getVilles() {
-    return new Promise(function (resolve, reject) {
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", "https://datanova.legroupe.laposte.fr/api/records/1.0/search/?dataset=laposte_hexasmal&sort=code_postal&facet=nom_de_la_commune&facet=code_postal&refine.code_postal=79000", true);
-        xhr.onload = function () {
-            var status = xhr.status;
-            if (status == 200) {
-                let setArr = new Set();
-                const villes = JSON.parse(xhr.responseText)
-                //console.log(villes);
-                villes.records.forEach(element => {
-                    console.log(element.fields.nom_de_la_commune);
-                    setArr.add(element.fields.nom_de_la_commune);
-                }); 
-                console.log("fini");
-                resolve(setArr);            
-            }
-            else if (status == 400) {
-                reject(status);
-            }
-            else {
-                reject(status);
-            }
-            return true;
-        };
-        xhr.send();
-    });
-}
 
 function inject(data){
             //console.log(data.user);
@@ -66,7 +61,7 @@ function inject(data){
             //le pays, select option
             var jform_ACT_cp =  document.getElementById("jform_ACT_cp").value=data.user.zipCodeRep1;
             //ville, select option (dynamique)
-            var jform_ACT_dateNaissance =  document.getElementById("jform_ACT_dateNaissance").value=data.user.birthDate;
+            //var jform_ACT_dateNaissance =  document.getElementById("jform_ACT_dateNaissance").value=data.user.birthDate;
             var jform_ACT_tel1 =  document.getElementById("jform_ACT_tel1").value=data.user.phoneRep1;
             var jform_ACT_tel2 =  document.getElementById("jform_ACT_tel2").value=data.user.phoneRep2;
             var jform_ACT_mail =  document.getElementById("jform_ACT_mail").value=data.user.emailRep1;

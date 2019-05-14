@@ -16,24 +16,16 @@ document.addEventListener('DOMContentLoaded',  () => {
       document.getElementById("last_update").textContent = "Dernière initialisation : Jamais";
 
     }
-
   });
 
   
-  chrome.storage.local.get(["users"], function(items){
-    if(items.users != null){
-      var select = document.getElementById("member-select");
-
-      for (let i = 0; i < items.users.length; i++) {
-        const element = items.users[i];
-        select.options[select.options.length] = new Option(element.firstName + " " + element.lastName, element.id);
-      }
-    }
-   
-
+  chrome.storage.local.get(["users","added"], function(items){
+      update_select_list(items.users);
+      displayAdded(items.added);
   });
   
 
+  
   //button listener
     document.getElementById("btn_alert").addEventListener("click", function() { 
       document.getElementById("errorPaste").textContent = "Copie en cours ...";
@@ -45,6 +37,7 @@ document.addEventListener('DOMContentLoaded',  () => {
       document.getElementById("errorInit").textContent = "Initialisation en cours ...";
       copy();
     });
+
     //inject du javascript dans la page actuelle
     chrome.tabs.executeScript( {file: 'content_script.js'});
 });
@@ -61,12 +54,10 @@ function copy() {
           }else{
             chrome.storage.local.set({ "users": obj.response }, null);
             chrome.storage.local.set({ "last_update": Date.now() }, null);
-            var select = document.getElementById("member-select");
-  
-            for (let i = 0; i < obj.response.length; i++) {
-              const element = obj.response[i];
-              select.options[select.options.length] = new Option(element.firstName + " " + element.lastName, element.id);
-            }
+
+
+            update_select_list(obj.response);
+
             const last_update_date = new Date();
             document.getElementById("last_update").textContent = 'Dernière initialisation : '+ days[last_update_date.getDay()]+ " "+ last_update_date.getDate() +" " + months[last_update_date.getDay()]+", "+ last_update_date.getHours()+"h"+last_update_date.getMinutes();
             document.getElementById("errorInit").textContent = "Données copiées avec succès.";
@@ -110,7 +101,10 @@ function sendUser(user){
     data["user"] = user;
     chrome.tabs.query({'active': true, 'lastFocusedWindow': true}, function (tabs) {
       chrome.tabs.sendMessage(tabs[0].id, data, null, function(obj) {
-        document.getElementById("errorPaste").textContent = "Adhérent copié avec succès.";
+        if(obj.status=="ok"){
+          document.getElementById("errorPaste").textContent = "Adhérent copié avec succès.";
+        }
+        
       });
     });
 }
@@ -119,3 +113,66 @@ function inccorectValue(error){
   document.getElementById("errorPaste").textContent = error;
 }
 
+function heavyStuff(request, sender, sendResponse)
+{
+    sendResponse("ok")
+}
+
+
+
+function displayAdded(added){
+    if(added == null || added.length < 1){
+      document.getElementById("added").innerHTML = "Pas d'adhérents à synchroniser.";
+    }else{
+      var newAdded = added;
+
+      var arrayHTML = "";
+
+      newAdded.forEach(function (element) {
+        arrayHTML += "<p>"+element.firstName+" "+element.lastName+"<a href ='#' data-id="+element.id+" class='delete'>Supprimer</a></p>";
+        
+      })
+
+
+      document.getElementById("added").innerHTML=arrayHTML;
+      var testElements = document.getElementsByClassName('delete');
+      for(var i = 0; i < testElements.length; i++)
+      {
+        const item = testElements.item(i);
+        
+        testElements.item(i).addEventListener("click", function() { 
+          chrome.storage.local.get(["added","users"], function(items_bis){
+            const id = item.getAttribute("data-id");
+            //copy of newAdded in newAdded_bis
+            let newAdded_bis = items_bis.added.slice(0);
+            let newUsers = items_bis.users.slice(0);
+            for (let j = 0; j < newAdded.length; j++) {
+              const element = newAdded[j];
+              if(element.id == id){
+                newAdded_bis.splice(j,1);
+                newUsers.push(element);
+              }
+            }
+            chrome.storage.local.set({ "added": newAdded_bis }, null);
+            chrome.storage.local.set({ "users": newUsers }, null);
+        
+            displayAdded(newAdded_bis);
+            update_select_list(newUsers);
+          });
+        });
+      }
+
+    }
+}
+
+function update_select_list(users){
+  if(users != null){
+    var select = document.getElementById("member-select");
+    select.options.length=0;
+
+    for (let i = 0; i < users.length; i++) {
+      const element = users[i];
+      select.options[select.options.length] = new Option(element.firstName + " " + element.lastName, element.id);
+    }
+  }
+}

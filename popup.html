@@ -80,7 +80,9 @@
       <div><img src="icon.png" alt="Icon CEP Gym" /></div>
       <div><h1>Outil de copie - CEP</h1></div>
     </div>
+    <p><strong>Initialisation : </strong></p>
     <div class="container">
+        
       <div>
           <button id="btn_copy" class="">Initialiser</button>
       </div>
@@ -94,9 +96,10 @@
           <p id="last_update"></p>
       </div>
     </div>
+    <p><strong>Copie d'un adhérent : </strong></p>
     <div class="container">
         <div> 
-          <select id="member-select" class ="soflow">
+          <select id="member-select" class ="soflow" style="margin-top: 0px;">
             <option value="-1">Veuillez séléctionner un adhérent</option>
           </select>
         </div>
@@ -105,7 +108,18 @@
       <div><button id="btn_alert" class="">Coller dans le formulaire</button></div>
       <div> <p id="errorPaste" class="error"></p></div>
     </div>
+
+    <p><strong>Adhérents à synchroniser : </strong></p>
     
+    <div class="container">
+      <div>
+          <div id="added">
+            </div>
+            <p style = "margin-bottom: 0px">Afin de synchroniser les adhérents enregistrés sur GestGym avec la base de donnée,</p>
+            <p style = "margin-top: 0px">rendez-vous sur la page dédiée dans l'administration et cliquez sur le bouton ci-dessous.</p>
+            <button id="test" class="">Synchroniser</button>      
+          </div>
+      </div>
     
   </body>
 </html>
