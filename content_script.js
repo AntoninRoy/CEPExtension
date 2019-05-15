@@ -4,7 +4,7 @@ if(document.getElementById("btn_save_close") != undefined){
         if(document.getElementById("acteur-form").checkValidity()){
             console.log("VALID");
             if(localStorage.getItem('actual_user') != null){
-                chrome.runtime.sendMessage("nojbendfnanjkehmdfghipgalnikmokk",localStorage.getItem('actual_user'));
+                chrome.runtime.sendMessage("nojbendfnanjkehmdfghipgalnikmokk",{command : "user_validate", actual_user : localStorage.getItem('actual_user')});
                 localStorage.setItem('actual_user', null);
 
             }
@@ -12,13 +12,23 @@ if(document.getElementById("btn_save_close") != undefined){
             console.log("NON VALIDE");
             if(DEV){
                 if(localStorage.getItem('actual_user') != null){
-                    chrome.runtime.sendMessage("nojbendfnanjkehmdfghipgalnikmokk",localStorage.getItem('actual_user'));
+                    chrome.runtime.sendMessage("nojbendfnanjkehmdfghipgalnikmokk",{command : "user_validate", actual_user : localStorage.getItem('actual_user')});
                     localStorage.setItem('actual_user', null);
                 }
             }
         }
             
         }, false);
+}
+
+
+if(document.getElementById("a") != null){
+    var fct = function (){
+        alert("dqedqdqz");
+        chrome.runtime.sendMessage("nojbendfnanjkehmdfghipgalnikmokk",{ command : "clean"});
+    }
+    document.getElementById("a").removeEventListener("click", fct);
+    document.getElementById("a").addEventListener("click", fct);
 }
 
 
@@ -41,6 +51,17 @@ chrome.runtime.onMessage.addListener(async function(data, sender, sendResponse) 
                 response: "Adhérent copié avec succès."
             });
     
+            break;
+
+        case "sync_added" :
+            document.getElementById("sync").textContent = JSON.stringify(data.ids);
+            document.getElementById("sync").click();
+
+            sendResponse({
+                status: "ok",
+                response: "Adhérent copié avec succès."
+            });
+            
             break;
 
         default:
