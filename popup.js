@@ -45,29 +45,43 @@ document.addEventListener('DOMContentLoaded',  () => {
     });
 
     
-
+    chrome.tabs.query({'active': true, 'lastFocusedWindow': true}, function (tabs) {
+      chrome.tabs.executeScript( {file: 'content_script.js'});
+    });
     //inject du javascript dans la page actuelle
-    chrome.tabs.executeScript( {file: 'content_script.js'});
+   
 });
 
 function sync(){
+
   chrome.storage.local.get(["added"], function(items_bis){
 
+  
     let added = items_bis.added;
-    let ids = [];
+    if(added !=null && added.length > 0){
+      let ids = [];
     
-    added.forEach(element => {
-      ids.push(element.id);  
-    });
+      added.forEach(element => {
+        ids.push(element.id);  
+      });
 
-    chrome.tabs.query({'active': true, 'lastFocusedWindow': true}, function (tabs) {
+      chrome.tabs.query({'active': true, 'lastFocusedWindow': true}, function (tabs) {
         var data = new Object();
         data["command"] = "sync_added";
         data["ids"] = ids;
+
         chrome.tabs.sendMessage(tabs[0].id, data, null, function(obj) {
-          document.getElementById("errorSync").textContent = "Synchronisation terminée ...";
+         
+          document.getElementById("errorSync").textContent = "Synchronisation terminée .";
+          window.close();
         });
     });
+    }else{
+      document.getElementById("errorSync").textContent = "Aucun élément a synchroniser.";
+    }
+    
+
+    
 
   });
 }
