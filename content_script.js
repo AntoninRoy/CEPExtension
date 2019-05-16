@@ -14,7 +14,7 @@ if(document.getElementById("first_open") != null){
             if(document.getElementById("acteur-form").checkValidity()){
                 console.log("VALID");
                 if(localStorage.getItem('actual_user') != null){
-                    chrome.runtime.sendMessage("nojbendfnanjkehmdfghipgalnikmokk",{command : "user_validate", actual_user : localStorage.getItem('actual_user')});
+                    chrome.runtime.sendMessage("fjedfndpieldogopokeencegagglaefp",{command : "user_validate", actual_user : localStorage.getItem('actual_user')});
                     localStorage.setItem('actual_user', null);
 
                 }
@@ -23,7 +23,7 @@ if(document.getElementById("first_open") != null){
                 //pour les tests
                 if(true){
                     if(localStorage.getItem('actual_user') != null){
-                        chrome.runtime.sendMessage("nojbendfnanjkehmdfghipgalnikmokk",{command : "user_validate", actual_user : localStorage.getItem('actual_user')});
+                        chrome.runtime.sendMessage("fjedfndpieldogopokeencegagglaefp",{command : "user_validate", actual_user : localStorage.getItem('actual_user')});
                         localStorage.setItem('actual_user', null);
                     }
                 }
@@ -35,7 +35,7 @@ if(document.getElementById("first_open") != null){
 
     if(document.getElementById("a") != null){
         document.getElementById("a").addEventListener("click", function (){
-            chrome.runtime.sendMessage("nojbendfnanjkehmdfghipgalnikmokk",{ command : "clean"});
+            chrome.runtime.sendMessage("fjedfndpieldogopokeencegagglaefp",{ command : "clean"});
         });
     }
 
@@ -104,14 +104,16 @@ chrome.runtime.onMessage.addListener(OnMessageListener);
             case "copy_licence_holders" :
                 console.log("La je copie");
                 var text =  document.getElementById("competiteur").textContent;
+                document.getElementById("init").click();
+
                 sendResponse({
                     response: JSON.parse(text)
                 });
                 break; 
             case "paste_licence_holder" :
-            localStorage.setItem('actual_user', JSON.stringify(data.user));
+                localStorage.setItem('actual_user', JSON.stringify(data.user));
 
-            inject(data);
+                inject(data);
                 sendResponse({
                     status: "ok",
                     response: "Adhérent copié avec succès."
