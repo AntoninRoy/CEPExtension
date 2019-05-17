@@ -8,13 +8,10 @@ const months = ["Décembre","Janvier","Fevrier","Mars","Avril","Mai","Juin","Jui
 document.addEventListener('DOMContentLoaded',  () => {
   chrome.storage.local.get(["last_update"], function(items){
     if(items.last_update != null){
-      
       const last_update_date = new Date(items.last_update);
-     
       document.getElementById("last_update").textContent = 'Dernière initialisation : '+ days[last_update_date.getDay()]+ " "+ last_update_date.getDate() +" " + months[last_update_date.getDay()]+", "+ last_update_date.getHours()+"h"+last_update_date.getMinutes();
     }else{
       document.getElementById("last_update").textContent = "Dernière initialisation : Jamais";
-
     }
   });
 
@@ -71,9 +68,13 @@ function sync(){
         data["ids"] = ids;
 
         chrome.tabs.sendMessage(tabs[0].id, data, null, function(obj) {
-         
+         if(obj.status == "ok"){
           document.getElementById("errorSync").textContent = "Synchronisation terminée .";
           window.close();
+         }else{
+          document.getElementById("errorSync").textContent = "Impossible de synchroniser sur cette page.";
+         }
+
         });
     });
     }else{
@@ -86,28 +87,39 @@ function sync(){
   });
 }
 function copy() {
+
   chrome.tabs.query({'active': true, 'lastFocusedWindow': true}, function (tabs) {
-      var data = new Object();
-      data["command"] = "copy_licence_holders";
-      // request content_script to retrieve title element innerHTML from current tab
-      chrome.tabs.sendMessage(tabs[0].id, data, null, function(obj) {
-          if(obj == undefined|| obj.response == undefined || obj.response.length < 1 || obj.response.length ==undefined){
-            document.getElementById("errorInit").textContent = "Impossible de copier les données.";
-          }else{
-            chrome.storage.local.set({ "users": obj.response }, null);
-            chrome.storage.local.set({ "last_update": Date.now() }, null);
+    
+      chrome.storage.local.get(["added"], function(items){
+        if(items.added == null || items.added.length == 0){
+          var data = new Object();
+          data["command"] = "copy_licence_holders";
+          // request content_script to retrieve title element innerHTML from current tab
+          chrome.tabs.sendMessage(tabs[0].id, data, null, function(obj) {
+              if(obj == undefined|| obj.response == undefined || obj.response.length < 1 || obj.response.length ==undefined){
+                document.getElementById("errorInit").textContent = "Impossible de copier les données.";
+              }else{
+                setTimeout(function(){
+                  chrome.storage.local.set({ "users": obj.response }, null);
+                  chrome.storage.local.set({ "last_update": Date.now() }, null);
+      
+      
+                  update_select_list(obj.response);
+      
+                  const last_update_date = new Date();
+                  document.getElementById("last_update").textContent = 'Dernière initialisation : '+ days[last_update_date.getDay()]+ " "+ last_update_date.getDate() +" " + months[last_update_date.getDay()]+", "+ last_update_date.getHours()+"h"+last_update_date.getMinutes();
+                  document.getElementById("errorInit").textContent = "Données copiées avec succès.";
+                }, 2000);
 
-
-            update_select_list(obj.response);
-
-            const last_update_date = new Date();
-            document.getElementById("last_update").textContent = 'Dernière initialisation : '+ days[last_update_date.getDay()]+ " "+ last_update_date.getDate() +" " + months[last_update_date.getDay()]+", "+ last_update_date.getHours()+"h"+last_update_date.getMinutes();
-            document.getElementById("errorInit").textContent = "Données copiées avec succès.";
-          }
-         
-
-          
+              }
+          });
+        }else{
+          document.getElementById("errorInit").textContent = "Votre pile d'éléments à synchroniser doit être vide pour initialiser.";
+        }
+        
       });
+
+      
   });
 }
 
@@ -171,7 +183,7 @@ function displayAdded(added){
       var arrayHTML = "";
 
       newAdded.forEach(function (element) {
-        arrayHTML += "<p>"+element.firstName+" "+element.lastName+"<a href ='#' data-id="+element.id+" class='delete'>Supprimer</a></p>";
+        arrayHTML += "<p>"+element.firstName+" "+element.lastName+" <a href ='#' data-id="+element.id+" class='delete'>Remettre dans la liste a copier</a></p>";
         
       })
 

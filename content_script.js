@@ -1,3 +1,9 @@
+
+/*
+Une erreur dans le javascript de la page cible empechera le javascript injecté de s'éexecuter
+*/
+
+
 if(document.getElementById("first_open") != null){
     console.log("Existe déja !");
     
@@ -110,6 +116,7 @@ chrome.runtime.onMessage.addListener(OnMessageListener);
                 });
                 break; 
             case "paste_licence_holder" :
+                
                 localStorage.setItem('actual_user', JSON.stringify(data.user));
 
                 inject(data);
@@ -121,13 +128,19 @@ chrome.runtime.onMessage.addListener(OnMessageListener);
                 break;
 
             case "sync_added" :
-                document.getElementById("ids").textContent = JSON.stringify(data.ids);
-                document.getElementById("sync").click();
+                if(document.getElementById("sync")!= undefined){
+                    document.getElementById("ids").textContent = JSON.stringify(data.ids);
+                    document.getElementById("sync").click();
 
-                sendResponse({
-                    status: "ok",
-                    response: "Adhérent copié avec succès."
-                });
+                    sendResponse({
+                        status: "ok",
+                    });
+                }else{
+                    sendResponse({
+                        status: "nok",
+                    });
+                }
+                
                 
                 break;
 

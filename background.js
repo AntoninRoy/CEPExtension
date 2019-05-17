@@ -1,15 +1,3 @@
-chrome.runtime.onConnect.addListener(function (externalPort) {
-    console.log("ddqdzdzqdqz");
-    externalPort.onDisconnect.addListener(function () {
-      console.log("onDisconnect")
-      // Do stuff that should happen when popup window closes here
-    })
-  
-    console.log("onConnect")
-  })
-
-
-
 chrome.runtime.onMessage.addListener(function(data, sender, sendResponse) {
     switch(data.command){
         case "user_validate" :
