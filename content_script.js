@@ -1,4 +1,3 @@
-
 if(document.getElementById("first_open") != null){
     console.log("Existe déja !");
     
@@ -14,7 +13,7 @@ if(document.getElementById("first_open") != null){
             if(document.getElementById("acteur-form").checkValidity()){
                 console.log("VALID");
                 if(localStorage.getItem('actual_user') != null){
-                    chrome.runtime.sendMessage("fjedfndpieldogopokeencegagglaefp",{command : "user_validate", actual_user : localStorage.getItem('actual_user')});
+                    chrome.runtime.sendMessage(chrome.runtime.id,{command : "user_validate", actual_user : localStorage.getItem('actual_user')});
                     localStorage.setItem('actual_user', null);
 
                 }
@@ -23,7 +22,7 @@ if(document.getElementById("first_open") != null){
                 //pour les tests
                 if(true){
                     if(localStorage.getItem('actual_user') != null){
-                        chrome.runtime.sendMessage("fjedfndpieldogopokeencegagglaefp",{command : "user_validate", actual_user : localStorage.getItem('actual_user')});
+                        chrome.runtime.sendMessage(chrome.runtime.id,{command : "user_validate", actual_user : localStorage.getItem('actual_user')});
                         localStorage.setItem('actual_user', null);
                     }
                 }
@@ -35,7 +34,7 @@ if(document.getElementById("first_open") != null){
 
     if(document.getElementById("a") != null){
         document.getElementById("a").addEventListener("click", function (){
-            chrome.runtime.sendMessage("fjedfndpieldogopokeencegagglaefp",{ command : "clean"});
+            chrome.runtime.sendMessage(chrome.runtime.id,{ command : "clean"});
         });
     }
 
