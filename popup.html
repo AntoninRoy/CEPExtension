@@ -5,29 +5,34 @@
  value "popup.html".
  -->
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Getting Started Extension's Popup</title>
-    <style type="text/css">
-      body {
-        margin: 10px;
-        white-space: nowrap;
-      }
 
-      h1 {
-        font-size: 15px;
-      }
+<head>
+  <meta charset="UTF-8">
+  <title>Getting Started Extension's Popup</title>
+  <link rel="stylesheet" href="dataTables.min.css">
+  <style type="text/css">
+    body {
+      margin: 10px;
+      white-space: nowrap;
+    }
 
-      button {
-        background-color: #8a020e;
-        border :none;
-        padding : 10px 20px 10px 20px;
-        color : white;
-        border-radius: 2px;
-        font-size : inherit;
-        } /* Green */
+    h1 {
+      font-size: 15px;
+    }
 
-    select.soflow{
+    button {
+      background-color: #8a020e;
+      border: none;
+      padding: 5px 10px 5px 10px;
+      color: white;
+      border-radius: 2px;
+      font-size: inherit;
+      height: 25px;
+    }
+
+    /* Green */
+
+    select.soflow {
       -webkit-appearance: button;
       -webkit-border-radius: 2px;
       -webkit-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
@@ -48,86 +53,102 @@
       width: 300px;
     }
 
-    .container{
-      display : flex;
+    .container {
+      display: flex;
       align-items: center;
     }
-    .container h1{
-      font-size : 20px;
+
+    .container h1 {
+      font-size: 20px;
       margin-left: 15px;
-      
-    }
-    .container p.error{
-      margin-left: 15px;
+
     }
 
-    </style>
+    .container p.error {
+      margin-left: 15px;
+    }
+  </style>
 
-    <!--
-      - JavaScript and HTML must be in separate files: see our Content Security
-      - Policy documentation[1] for details and explanation.
-      -
-      - [1]: https://developer.chrome.com/extensions/contentSecurityPolicy
-    -->
-    <script src="jquery-3.3.1.min.js"></script>
-    <script src="popup.js"></script>
-     </head>
+  <script src="jquery-3.3.1.min.js"></script>
+  <script src="dataTables.min.js"></script>
+  <script src="popup.js"></script>
+</head>
 
-  <body>
-      
-    
-    <div class="container">
-      <div><img src="icon.png" alt="Icon CEP Gym" /></div>
-      <div><h1>Outil de copie - CEP</h1></div>
-    </div>
-    <p><strong>Initialisation : </strong></p>
-    <div class="container">
-        
-      <div>
-          <button id="btn_copy" class="">Initialiser</button>
-      </div>
-      <div>
-          <div> <p id="errorInit" class="error"></p></div>
-      </div>
-    </div>
-    <div class="container">  
-      <div>
-          <p>N'oubliez pas d'initialiser les données des adhérents avant d'utiliser le bouton "Coller dans le formulaire"</p>
-          <p id="last_update"></p>
-      </div>
-    </div>
-    <p><strong>Copie d'un adhérent : </strong></p>
-    <div class="container">
-        <div> 
-          <select id="member-select" class ="soflow" style="margin-top: 0px;">
-            <option value="-1">Veuillez séléctionner un adhérent</option>
-          </select>
-        </div>
-    </div>
-    <div class="container">
-      <div><button id="btn_alert" class="">Coller dans le formulaire</button></div>
-      <div> <p id="errorPaste" class="error"></p></div>
-    </div>
+<body>
 
-    <p><strong>Adhérents à synchroniser : </strong></p>
-    
-    <div class="container">
-      <div>
-          <div id="added">
-          </div>
-          <p style = "margin-bottom: 0px">Afin de synchroniser les adhérents enregistrés sur GestGym avec la base de donnée,</p>
-          <p style = "margin-top: 0px">rendez-vous sur la page dédiée dans l'administration et cliquez sur le bouton ci-dessous.</p>
-        </div>
+
+  <div class="container">
+    <div><img src="icon.png" alt="Icon CEP Gym" /></div>
+    <div>
+      <h1>Outil de copie - CEP</h1>
     </div>
-    <div class="container">
-        
+  </div>
+  <p><strong>Initialisation : </strong></p>
+  <div class="container">
+
+    <div>
+      <button id="btn_copy" class="">Initialiser</button>
+    </div>
+    <div>
       <div>
-        <button id="btn_sync" class="">Synchroniser</button>      
-      </div>
-      <div>
-          <div> <p id="errorSync" class="error"></p></div>
+        <p id="errorInit" class="error"></p>
       </div>
     </div>
+  </div>
+  <div class="container">
+    <div>
+      <p>N'oubliez pas d'initialiser les données des adhérents avant d'utiliser le bouton "Coller dans le formulaire"
+      </p>
+      <p id="last_update"></p>
+    </div>
+  </div>
+  <p><strong>Copie d'un adhérent : </strong></p>
+  <div class="container">
+    <div>
+        <table id="example" class="display" style="width:100%">
+          <tbody>
+          </tbody>
+        </table>
+    </div>
+  </div>
+  <div class="container">
+    <div>
+      <p id="errorPaste" class="error"></p>
+    </div>
+  </div>
+
+  <p><strong>Adhérents à synchroniser : </strong></p>
+
+  <div class="container">
+    <div>
+      <table id="toSync" class="display" style="width:100%">
+          <tbody>
+          </tbody>
+        </table>
+
+      <p style="margin-bottom: 0px">Afin de synchroniser les adhérents enregistrés sur GestGym avec la base de donnée,
+      </p>
+      <p style="margin-top: 0px">rendez-vous sur la page dédiée dans l'administration et cliquez sur le bouton
+        ci-dessous.</p>
+    </div>
+  </div>
+  <div class="container">
+
+    <div>
+      <button id="btn_sync" class="">Synchroniser</button>
+    </div>
+    <div>
+      <div>
+        <p id="errorSync" class="error"></p>
+      </div>
+    </div>
+  </div>
+  <div class="container-table" style="width : 550px;">
     
-  </body>
+  </div>
+
+
+
+</body>
+
 </html>
