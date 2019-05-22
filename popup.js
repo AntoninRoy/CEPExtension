@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ],
     "pageLength": 4
   });
-  
+
   chrome.storage.local.get(["users", "added","last_update"], function (items) {
     update_select_list(items.users);
     displayAdded(items.added);
@@ -56,12 +56,18 @@ document.addEventListener('DOMContentLoaded', () => {
       //Recuperation dans le storage local des adhérents initialisés "users" et des adhérents à synchroniser "added "
       chrome.storage.local.get(["added", "users"], function (items_bis) {
         var added = items_bis.added;
+        if(added ==null)
+          added = [];
+
         var users = items_bis.users;
+        if(users ==null)
+           users = [];
 
         //Recherche de l'adhérent dans la liste "users"
         for (let j = 0; j < users.length; j++) {
           const element = users[j];
           if (element.id == id) {
+
             //On le retire de la liste "users"
             users.splice(j, 1);
             //Et on l'ajoute dans les "added"
@@ -85,7 +91,12 @@ document.addEventListener('DOMContentLoaded', () => {
       //Recuperation dans le storage local des adhérents initialisés "users" et des adhérents à synchroniser "added "
       chrome.storage.local.get(["added", "users"], function (items_bis) {
         var added = items_bis.added;
+        if(added ==null)
+          added = [];
+
         var users = items_bis.users;
+        if(users ==null)
+           users = [];
 
         //Recherche de l'adhérent dans la liste "added"
         for (let j = 0; j < added.length; j++) {
