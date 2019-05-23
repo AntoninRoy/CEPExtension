@@ -1,63 +1,65 @@
 chrome.runtime.onMessage.addListener(function(data, sender, sendResponse) {
     switch(data.command){
         case "user_validate" :
-            user_validate(data.actual_user)
+            user_validate(data.actual_user);
+            console.log(data.actual_user);
             break;
         case "clean" : 
-            chrome.storage.local.set({ "added": null }, null);
+            chrome.storage.local.set({ "to_sync_users": null }, null);
             break;
     }
 });
 
 
 function user_validate(actual_user){
-    chrome.storage.local.get(["added","users"], function(items){
-        if(items.added == null || items.added.length == 0){
-            //create added array
+    chrome.storage.local.get(["to_sync_users","to_paste_users"], function(items){
+        
+        if(items.to_sync_users == null || items.to_sync_users.length == 0){
+            //create to_sync_users array
             const newAdherent = JSON.parse(actual_user);
-            var newAdded = [
+            var newto_sync_users = [
                 newAdherent
             ];
 
-            var users = items.users;
-            for(var i = 0; i < users.length; i++)
+            var to_paste_users = items.to_paste_users;
+            for(var i = 0; i < to_paste_users.length; i++)
             {
-                const element = users[i];
+                const element = to_paste_users[i];
                 if(element.id == newAdherent.id){
-                    users.splice(i,1);
+                    to_paste_users.splice(i,1);
                 }
             }
 
-            //Set value "added" in chrome extension storage local 
-            chrome.storage.local.set({ "added": newAdded }, null);
-            chrome.storage.local.set({ "users": users }, null);
+            //Set value "to_sync_users" in chrome extension storage local 
+            chrome.storage.local.set({ "to_sync_users": newto_sync_users }, null);
+            chrome.storage.local.set({ "to_paste_users": to_paste_users }, null);
         }else{
-            var newAdded = items.added;
-            var users = items.users;
-            //forEach loop to test if the adherent is not already in the added array
+            var newto_sync_users = items.to_sync_users;
+            var to_paste_users = items.to_paste_users;
+            //forEach loop to test if the adherent is not already in the to_sync_users array
             let flag = true;
             const newAdherent = JSON.parse(actual_user);
-            newAdded.forEach(function (element) {
+            newto_sync_users.forEach(function (element) {
                 if(element.id == newAdherent.id){
                     flag=false;
                 }
             });
 
-            var users = items.users;
-            for(var i = 0; i < users.length; i++)
+            var to_paste_to_paste_users = items.to_paste_users;
+            for(var i = 0; i < to_paste_users.length; i++)
             {
-                const element = users[i];
+                const element = to_paste_users[i];
                 if(element.id == newAdherent.id){
-                    users.splice(i,1);
+                    to_paste_users.splice(i,1);
                 }
             }
 
             if(flag)
-                newAdded.push(newAdherent);
+                newto_sync_users.push(newAdherent);
 
-             //Set value "added" in chrome extension storage local 
-            chrome.storage.local.set({ "added": newAdded }, null);
-            chrome.storage.local.set({ "users": users }, null);
+             //Set value "to_sync_users" in chrome extension storage local 
+            chrome.storage.local.set({ "to_sync_users": newto_sync_users }, null);
+            chrome.storage.local.set({ "to_paste_users": to_paste_users }, null);
         }
       });
 }
