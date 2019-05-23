@@ -21,7 +21,6 @@ if(document.getElementById("first_open") != null){
                 if(localStorage.getItem('actual_user') != null){
                     chrome.runtime.sendMessage(chrome.runtime.id,{command : "user_validate", actual_user : localStorage.getItem('actual_user')});
                     localStorage.setItem('actual_user', null);
-
                 }
             }else{
                 console.log("NON VALIDE");
@@ -109,6 +108,8 @@ chrome.runtime.onMessage.addListener(OnMessageListener);
             case "copy_licence_holders" :
                 console.log("La je copie");
                 var text =  document.getElementById("competiteur").textContent;
+                console.log("text : ",text);
+                console.log("text2 : ",JSON.parse(text));
                 document.getElementById("init").click();
 
                 sendResponse({

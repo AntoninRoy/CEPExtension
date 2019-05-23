@@ -187,8 +187,18 @@ function copy() {
         data["command"] = "copy_licence_holders";
         // request content_script to retrieve title element innerHTML from current tab
         chrome.tabs.sendMessage(tabs[0].id, data, null, function (obj) {
-          if (obj == undefined || obj.response == undefined || obj.response.length < 1 || obj.response.length == undefined) {
+          console.log("obj",obj)
+          if (obj == undefined || obj.response == undefined || obj.response.length == undefined) {
             document.getElementById("errorInit").textContent = "Impossible de copier les données.";
+          } else if(obj.response.length < 1){
+            setTimeout(function () {
+              document.getElementById("errorInit").textContent = "Il n'y a pas d'adhérents à synchroniser.";
+              chrome.storage.local.set({ "to_paste_users": null }, null);
+              chrome.storage.local.set({ "last_update": Date.now() }, null);
+
+              displayInitUsers(null);
+
+            }, 2000);
           } else {
             setTimeout(function () {
               chrome.storage.local.set({ "to_paste_users": obj.response }, null);
