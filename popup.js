@@ -4,7 +4,10 @@
 
 
 document.addEventListener('DOMContentLoaded', () => {
+  //Initialisation des DataTables. Voir documentation pour plus de détails
+  var languages = { "sProcessing": "Traitement en cours...", "sSearch": "Rechercher&nbsp;:", "sLengthMenu": "Afficher _MENU_ &eacute;l&eacute;ments", "sInfo": "Affichage de l'&eacute;l&eacute;ment _START_ &agrave; _END_ sur _TOTAL_ &eacute;l&eacute;ments", "sInfoEmpty": "Affichage de l'&eacute;l&eacute;ment 0 &agrave; 0 sur 0 &eacute;l&eacute;ment", "sInfoFiltered": "(filtr&eacute; de _MAX_ &eacute;l&eacute;ments au total)", "sInfoPostFix": "", "sLoadingRecords": "Chargement en cours...", "sZeroRecords": "Aucun &eacute;l&eacute;ment &agrave; afficher", "sEmptyTable": "Aucune adherent disponible dans le tableau", "oPaginate": { "sFirst": "Premier", "sPrevious": "Pr&eacute;c&eacute;dent", "sNext": "Suivant", "sLast": "Dernier" }, "oAria": { "sSortAscending": ": activer pour trier la colonne par ordre croissant", "sSortDescending": ": activer pour trier la colonne par ordre d&eacute;croissant" }, "select": { "rows": { _: "%d lignes séléctionnées", 0: "Aucune ligne séléctionnée", 1: "1 ligne séléctionnée" } } }
   $('#toPaste').DataTable({
+    "language": languages,
     "bPaginate": true,
     "bLengthChange": false,
     "bFilter": true,
@@ -19,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   $('#toSync').DataTable({
+    "language": languages,
     "bPaginate": true,
     "bLengthChange": false,
     "bFilter": true,
@@ -34,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
   chrome.storage.local.get(["to_paste_users", "to_sync_users", "last_update"], function (items) {
 
     //##### INITIALISATION DES DONNEES DU PLUGIN #####
-                 
+
     //Affichage du tableau avec les adhérents prêts à etre copiés dans le formulaire de GestGym vers l'application web.
     displayInitUsers(items.to_paste_users);
     //Affichage du tableau avec les adhérents prêts à etre synchronisés vers l'application web.
@@ -57,105 +61,146 @@ document.addEventListener('DOMContentLoaded', () => {
     //Les listeners sont ajouté aux boutons "Coller dans le formulaire, qui permettent d'injecter les données d'un adhérent 
     //le formulaire de GestGym
     $('table#toPaste tbody').on('click', '.btn_paste', function (event) {
-      document.getElementById("paste_info").textContent = "Copie en cours ...";
-      paste(event.currentTarget.id);
+      confirm_popup(
+        "Confirmation",
+        "Etes vous sûr de vouloir coller les information de cet adhérent dans le formulaire GestGym ?",
+        function () {
+          document.getElementById("paste_info").textContent = "Copie en cours ...";
+          paste(event.currentTarget.id);
+        },
+        function () { }
+      );
+
     });
     //Ajout d'un listener (syntaxe différente que addListener car plusieurs listeners sont ajoutés en meme temps)
     //Les listeners sont ajouté aux boutons "Ajouter au synchronisés", qui permettent de changer un adhérent de la liste
     //"to_paste_users" a "to_sync_users"
     $('table#toPaste tbody').on('click', '.btn_toAdded', function (event) {
-      //Récupeartion de l'id de l'adhérent ou le bouton a été déclenché
-      const id = event.currentTarget.id;
+      confirm_popup(
+        "Confirmation",
+        "<p><strong>Attention ! Action déconseillée si cet adhérent n'est pas inscrit sur GestGym !</strong></p><p>Etes vous sûr de vouloir ajouter cet adhérent dans la liste des adhérents ajoutés sur GestGym ?</p>",
+        function () {
+          //Récupeartion de l'id de l'adhérent ou le bouton a été déclenché
+          const id = event.currentTarget.id;
 
-      //Recuperation dans le storage local des adhérents initialisés "to_paste_users" et des adhérents à synchroniser "to_sync_users "
-      chrome.storage.local.get(["to_sync_users", "to_paste_users"], function (items_bis) {
-        //test si to_sync_users n'est pas null. Si il l'est, on lui affecte un tableau vide
-        var to_sync_users = items_bis.to_sync_users;
-        if (to_sync_users == null)
-          to_sync_users = [];
+          //Recuperation dans le storage local des adhérents initialisés "to_paste_users" et des adhérents à synchroniser "to_sync_users "
+          chrome.storage.local.get(["to_sync_users", "to_paste_users"], function (items_bis) {
+            //test si to_sync_users n'est pas null. Si il l'est, on lui affecte un tableau vide
+            var to_sync_users = items_bis.to_sync_users;
+            if (to_sync_users == null)
+              to_sync_users = [];
 
-        //test si to_paste_users n'est pas null. Si il l'est, on lui affecte un tableau vide
-        var to_paste_users = items_bis.to_paste_users;
-        if (to_paste_users == null)
-          to_paste_users = [];
+            //test si to_paste_users n'est pas null. Si il l'est, on lui affecte un tableau vide
+            var to_paste_users = items_bis.to_paste_users;
+            if (to_paste_users == null)
+              to_paste_users = [];
 
-        //Recherche de l'adhérent dans la liste "to_paste_users"
-        for (let j = 0; j < to_paste_users.length; j++) {
-          const element = to_paste_users[j];
-          if (element.id == id) {
-            //On le retire de la liste "to_paste_users"
-            to_paste_users.splice(j, 1);
-            //Et on l'ajoute dans les "to_sync_users"
-            to_sync_users.push(element);
-          }
-        }
+            //Recherche de l'adhérent dans la liste "to_paste_users"
+            for (let j = 0; j < to_paste_users.length; j++) {
+              const element = to_paste_users[j];
+              if (element.id == id) {
+                //On le retire de la liste "to_paste_users"
+                to_paste_users.splice(j, 1);
+                //Et on l'ajoute dans les "to_sync_users"
+                to_sync_users.push(element);
+              }
+            }
 
-        //Actualisation des liste "to_sync_users" et "to_paste_users" avec l'adhérent changer de liste
-        chrome.storage.local.set({ "to_sync_users": to_sync_users }, null);
-        chrome.storage.local.set({ "to_paste_users": to_paste_users }, null);
+            //Actualisation des liste "to_sync_users" et "to_paste_users" avec l'adhérent changer de liste
+            chrome.storage.local.set({ "to_sync_users": to_sync_users }, null);
+            chrome.storage.local.set({ "to_paste_users": to_paste_users }, null);
 
-        //Actualisation de tableau avec les adhérents prêts à etre synchronisés vers l'application web.
-        displaySyncUsers(to_sync_users);
-        //Actualisation de tableau avec les adhérents prêts à etre copiés dans le formulaire de GestGym vers l'application web.
-        displayInitUsers(to_paste_users);
-      });
+            //Actualisation de tableau avec les adhérents prêts à etre synchronisés vers l'application web.
+            displaySyncUsers(to_sync_users);
+            //Actualisation de tableau avec les adhérents prêts à etre copiés dans le formulaire de GestGym vers l'application web.
+            displayInitUsers(to_paste_users);
+          });
+        },
+        function () { }
+      );
+
     });
 
     //Ajout d'un listener (syntaxe différente que addListener car plusieurs listeners sont ajoutés en meme temps)
     //Les listeners sont ajouté aux boutons "Remettre dans liste a copier", qui permettent de changer un adhérent de la liste
     //"to_sync_users" a "to_paste_users"
     $('table#toSync tbody').on('click', '.btn_return', function (event) {
-      //Récupeartion de l'id de l'adhérent ou le bouton a été déclenché
-      const id = event.currentTarget.id;
-      //Recuperation dans le storage local des adhérents initialisés "to_paste_users" et des adhérents à synchroniser "to_sync_users "
-      chrome.storage.local.get(["to_sync_users", "to_paste_users"], function (items_bis) {
-        //test si to_sync_users n'est pas null. Si il l'est, on lui affecte un tableau vide
-        var to_sync_users = items_bis.to_sync_users;
-        if (to_sync_users == null)
-          to_sync_users = [];
+      confirm_popup(
+        "Confirmation",
+        "<p><strong>Attention ! Action déconseillée si cet adhérent est déjà inscrit sur GestGym !</strong></p><p>Etes vous sûr de vouloir ajouter cet adhérent dans la liste des adhérents non ajoutés sur GestGym ?</p>",
+        function () {
+          //Récupeartion de l'id de l'adhérent ou le bouton a été déclenché
+          const id = event.currentTarget.id;
+          //Recuperation dans le storage local des adhérents initialisés "to_paste_users" et des adhérents à synchroniser "to_sync_users "
+          chrome.storage.local.get(["to_sync_users", "to_paste_users"], function (items_bis) {
+            //test si to_sync_users n'est pas null. Si il l'est, on lui affecte un tableau vide
+            var to_sync_users = items_bis.to_sync_users;
+            if (to_sync_users == null)
+              to_sync_users = [];
 
-        //test si to_paste_users n'est pas null. Si il l'est, on lui affecte un tableau vide
-        var to_paste_users = items_bis.to_paste_users;
-        if (to_paste_users == null)
-          to_paste_users = [];
+            //test si to_paste_users n'est pas null. Si il l'est, on lui affecte un tableau vide
+            var to_paste_users = items_bis.to_paste_users;
+            if (to_paste_users == null)
+              to_paste_users = [];
 
-        //Recherche de l'adhérent dans la liste "to_sync_users"
-        for (let j = 0; j < to_sync_users.length; j++) {
-          const element = to_sync_users[j];
-          //si TRUE, on vient de trouver l'adhérent dans la liste
-          if (element.id == id) {
-            //On le retire de la liste "to_sync_users"
-            to_sync_users.splice(j, 1);
-            //Et on l'ajoute dans les "to_paste_users"
-            to_paste_users.push(element);
-          }
-        }
+            //Recherche de l'adhérent dans la liste "to_sync_users"
+            for (let j = 0; j < to_sync_users.length; j++) {
+              const element = to_sync_users[j];
+              //si TRUE, on vient de trouver l'adhérent dans la liste
+              if (element.id == id) {
+                //On le retire de la liste "to_sync_users"
+                to_sync_users.splice(j, 1);
+                //Et on l'ajoute dans les "to_paste_users"
+                to_paste_users.push(element);
+              }
+            }
 
-        //Actualisation des liste "to_sync_users" et "to_paste_users" avec l'adhérent changer de liste
-        chrome.storage.local.set({ "to_sync_users": to_sync_users }, null);
-        chrome.storage.local.set({ "to_paste_users": to_paste_users }, null);
+            //Actualisation des liste "to_sync_users" et "to_paste_users" avec l'adhérent changer de liste
+            chrome.storage.local.set({ "to_sync_users": to_sync_users }, null);
+            chrome.storage.local.set({ "to_paste_users": to_paste_users }, null);
 
-        //Actualisation de tableau avec les adhérents prêts à etre synchronisés vers l'application web.
-        displaySyncUsers(to_sync_users);
-        //Actualisation de tableau avec les adhérents prêts à etre copiés dans le formulaire de GestGym vers l'application web.
-        displayInitUsers(to_paste_users);
-      });
+            //Actualisation de tableau avec les adhérents prêts à etre synchronisés vers l'application web.
+            displaySyncUsers(to_sync_users);
+            //Actualisation de tableau avec les adhérents prêts à etre copiés dans le formulaire de GestGym vers l'application web.
+            displayInitUsers(to_paste_users);
+          });
+        },
+        function () { }
+      );
+
+
     });
 
     //Listener du bouton "Initialisation". Lors d'un clic, la fonction défini en paramètre est exécutée.
     document.getElementById("btn_copy").addEventListener("click", function () {
-      //Modification du label d'information
-      document.getElementById("init_info").textContent = "Initialisation en cours ...";
-      //Lancement de la fonction d'initialisation.
-      init();
+      confirm_popup(
+        "Confirmation initialisation",
+        "Etes vous sûr de vouloir initialiser le plugin ?",
+        function () {
+          //Modification du label d'information
+          document.getElementById("init_info").textContent = "Initialisation en cours ...";
+          //Lancement de la fonction d'initialisation.
+          init();
+        },
+        function () { }
+      );
     });
 
     //Listener du bouton "Synchroniser". Lors d'un clic, la fonction défini en paramètre est exécutée.
     document.getElementById("btn_sync").addEventListener("click", function () {
-      //Modification du label d'information
-      document.getElementById("sync_info").textContent = "Synchronisation en cours ...";
-      //Lancement de la fonction de synchronisation.
-      sync();
+      confirm_popup(
+        "Confirmation synchronisation",
+        "Etes vous sûr de vouloir synchronier le plugin et la base de donnée ?",
+        function () {
+          //Modification du label d'information
+          document.getElementById("sync_info").textContent = "Synchronisation en cours ...";
+          //Lancement de la fonction de synchronisation.
+          sync();
+        },
+        function () { }
+      );
+
+
     });
 
   });
@@ -376,4 +421,30 @@ function displayUpdateInitDate(date) {
   const days = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
   const months = ["Janvier", "Fevrier", "Mars", "Avril", "Mai", "Juin", "Juillet", "Aout", "Septembre", "Octobre", "Novembre", "Décembre"];
   document.getElementById("last_update").textContent = 'Dernière initialisation : ' + days[date.getDay()] + " " + date.getDate() + " " + months[date.getMonth()] + ", " + date.getHours() + "h" + date.getMinutes();
+}
+
+function confirm_popup(titre, text, callbackYes, callbackNo) {
+  $.confirm({
+    title: titre,
+    content: text,
+
+    columnClass: 'col-md-4 col-md-offset-8 col-xs-4 col-xs-offset-8',
+    containerFluid: true, // this will add 'container-fluid' instead of 'container'
+    buttons: {
+      yes: {
+        text: 'Oui',
+        btnClass: 'btn-default',
+        action: function () {
+          callbackYes()
+        }
+      },
+      no: {
+        text: 'Non',
+        btnClass: 'btn-default',
+        action: function () {
+          callbackNo()
+        }
+      }
+    }
+  });
 }
