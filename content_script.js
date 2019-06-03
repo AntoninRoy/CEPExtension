@@ -59,7 +59,7 @@ if (document.getElementById("first_open") != null) {
         //le pays, select option
         document.getElementById("jform_ACT_cp").value = data.user.zipCodeRep1;
         //ville, select option (dynamique)
-        //=document.getElementById("jform_ACT_dateNaissance").value=data.user.birthDate;
+        //document.getElementById("jform_ACT_dateNaissance").value=data.user.birthDate;
         document.getElementById("jform_ACT_tel1").value = data.user.phoneRep1;
         document.getElementById("jform_ACT_tel2").value = data.user.phoneRep2;
         document.getElementById("jform_ACT_mail").value = data.user.emailRep1;
@@ -93,7 +93,7 @@ if (document.getElementById("first_open") != null) {
         else
             document.getElementById("jform_AAD_droit_image").value = 0;
 
-            
+
         document.getElementById("jform_AAD_date_inscription").value = data.user.jform_AAD_date_inscription;
         document.getElementById("jform_ACT_pays").value = compare_select_value(document.getElementById("jform_ACT_pays"), data.user.nationality, false)
 
