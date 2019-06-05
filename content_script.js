@@ -48,7 +48,6 @@ if (document.getElementById("first_open") != null) {
 
 
     function inject(data) {
-        //console.log(data.user);
         console.log(data);
         console.log("Les informations du licencié sont ajoutées ");
         document.getElementById("jform_ACT_nom").value = data.user.lastName;
@@ -60,48 +59,65 @@ if (document.getElementById("first_open") != null) {
         //le pays, select option
         document.getElementById("jform_ACT_cp").value = data.user.zipCodeRep1;
         //ville, select option (dynamique)
-        //var jform_ACT_dateNaissance =  document.getElementById("jform_ACT_dateNaissance").value=data.user.birthDate;
+        //document.getElementById("jform_ACT_dateNaissance").value=data.user.birthDate;
         document.getElementById("jform_ACT_tel1").value = data.user.phoneRep1;
         document.getElementById("jform_ACT_tel2").value = data.user.phoneRep2;
         document.getElementById("jform_ACT_mail").value = data.user.emailRep1;
         document.getElementById("jform_ACT_nomEpouse").value = "";
         document.getElementById("jform_ACT_num_licence").value = "";
         document.getElementById("jform_ACT_sexe").value = compare_select_value(document.getElementById("jform_ACT_sexe"), data.user.sex, true);
-        //saison, select option
         //discipline pratiquée. x3 Select option 
         //sous discipline select option
-        var jform_AAD_rl1_nom = document.getElementById("jform_AAD_rl1_nom").value = data.user.firstNameRep1;
-        var jform_AAD_rl1_tel = document.getElementById("jform_AAD_rl1_tel").value = data.user.phoneRep1;
-        var jform_AAD_rl1_mail = document.getElementById("jform_AAD_rl1_mail").value = data.user.emailRep1;
-        var jform_AAD_rl2_nom = document.getElementById("jform_AAD_rl2_nom").value = data.user.firstNameRep2;
-        var jform_AAD_rl2_tel = document.getElementById("jform_AAD_rl2_tel").value = data.user.phoneRep2;
-        var jform_AAD_rl2_mail = document.getElementById("jform_AAD_rl2_mail").value = data.user.emailRep2;
-        //select radio Certificat médical de santé
-        //select radio Questionnaire de santé
-        //Select option droit à l'image
-        var jform_AAD_date_inscription = document.getElementById("jform_AAD_date_inscription").value = data.user.jform_AAD_date_inscription;
+
+        
+        document.getElementById("jform_AAD_rl1_nom").value = data.user.firstNameRep1 + " " + data.user.lastNameRep1;
+        document.getElementById("jform_AAD_rl1_tel").value = data.user.phoneRep1;
+        document.getElementById("jform_AAD_rl1_mail").value = data.user.emailRep1;
+        
+        if(data.user.firstNameRep2 != null && data.user.lastNameRep2 != null){
+            document.getElementById("jform_AAD_rl2_nom").value = data.user.firstNameRep2+ " " + data.user.lastNameRep2;
+            document.getElementById("jform_AAD_rl2_tel").value = data.user.phoneRep2;
+            document.getElementById("jform_AAD_rl2_mail").value = data.user.emailRep2;
+        }
+
+
+        if(data.user.hasMedicalCertificate)
+            document.getElementById("jform_AAD_CM0").checked = true;
+
+        if(data.user.health_questionnaire_file)
+            document.getElementById("jform_AAD_CM_questionnaire0").checked = true;
+
+
+        if(data.user.imageRight)
+            document.getElementById("jform_AAD_droit_image").value = 1;
+        else
+            document.getElementById("jform_AAD_droit_image").value = 0;
+
+
+        document.getElementById("jform_AAD_date_inscription").value = data.user.jform_AAD_date_inscription;
         document.getElementById("jform_ACT_pays").value = compare_select_value(document.getElementById("jform_ACT_pays"), data.user.nationality, false)
 
-        var jform_AAD_CM_date = document.getElementById("jform_AAD_CM_date").value = data.user.registrationDate;
-        //Radio input Bordereau assurance FFG
+        document.getElementById("jform_AAD_CM_date").value = data.user.registrationDate;
+        if(data.user.has_bulletin_n2allianz)
+            document.getElementById("jform_AAD_ass_FFG0").checked = true;
         //Radio input Bloquer les envois par email
         //Radio input Licencié autre club
         //role dans l'association x5
-        var jform_AAD_comment = document.getElementById("jform_AAD_comment").value = "";
-        var jform_18086_0171002 = document.getElementById("jform_18086_0171002").value = "";
-        var jform_18086_0171003 = document.getElementById("jform_18086_0171003").value = "";
-        var jform_18086_0171004 = document.getElementById("jform_18086_0171004").value = "";
-        var jform_18086_0171005 = document.getElementById("jform_18086_0171005").value = "";
-        var jform_18086_0171006 = document.getElementById("jform_18086_0171006").value = "";
-        var jform_18086_0171007 = document.getElementById("jform_18086_0171007").value = "";
-        var jform_18086_0171008 = document.getElementById("jform_18086_0171008").value = "";
-        var jform_18086_0171009 = document.getElementById("jform_18086_0171009").value = "";
-        var jform_18086_0171010 = document.getElementById("jform_18086_0171010").value = "";
-        var jform_18086_0171011 = document.getElementById("jform_18086_0171011").value = "";
-        var jform_18086_0171012 = document.getElementById("jform_18086_0171012").value = "";
-        var jform_18086_0171013 = document.getElementById("jform_18086_0171013").value = "";
-        var jform_18086_0171014 = document.getElementById("jform_18086_0171014").value = "";
-        var jform_18086_0171015 = document.getElementById("jform_18086_0171015").value = "";
+        document.getElementById("jform_AAD_comment").value = "";
+        document.getElementById("jform_18086_0171002").value = "";
+        document.getElementById("jform_18086_0171003").value = "";
+        document.getElementById("jform_18086_0171004").value = "";
+        document.getElementById("jform_18086_0171005").value = "";
+        document.getElementById("jform_18086_0171006").value = "";
+        document.getElementById("jform_18086_0171007").value = "";
+        document.getElementById("jform_18086_0171008").value = "";
+        document.getElementById("jform_18086_0171009").value = "";
+        document.getElementById("jform_18086_0171010").value = "";
+        document.getElementById("jform_18086_0171011").value = "";
+        document.getElementById("jform_18086_0171012").value = "";
+        document.getElementById("jform_18086_0171013").value = "";
+        document.getElementById("jform_18086_0171014").value = "";
+        document.getElementById("jform_18086_0171015").value = "";
 
     }
 
@@ -140,6 +156,7 @@ if (document.getElementById("first_open") != null) {
     function similarity(s1, s2) {
         var longer = s1;
         var shorter = s2;
+
         if (s1.length < s2.length) {
             longer = s2;
             shorter = s1;

@@ -29,20 +29,20 @@ function user_validate(user){
         //Cas ou la liste des utilisateurs a synchroniser est vide
         if(items.to_sync_users == null || items.to_sync_users.length == 0){
             //recuperation de l'user a ajouter et on l'ajoute directement dans un tableau
-            const newAdherent = [JSON.parse(user)];
+            const user_to_sync = [JSON.parse(user)];
 
             //Boucle afin de supprimer l'user de la liste des éléments a copier
             var to_paste_users = items.to_paste_users;
             for(var i = 0; i < to_paste_users.length; i++)
             {
                 const element = to_paste_users[i];
-                if(element.id == newAdherent.id){
+                if(element.id == user_to_sync.id){
                     to_paste_users.splice(i,1);
                 }
             }
 
             //Actualisation de la liste "to_paste_users"
-            chrome.storage.local.set({ "to_sync_users": newAdherent }, null);
+            chrome.storage.local.set({ "to_sync_users": user_to_sync }, null);
             chrome.storage.local.set({ "to_paste_users": to_paste_users }, null);
         }else{
             var to_sync_users = items.to_sync_users;
@@ -61,7 +61,6 @@ function user_validate(user){
                 }
             }
 
-
             //Boucle afin de supprimer l'user de la liste des éléments a copier
             for(var i = 0; i < to_paste_users.length; i++)
             {
@@ -75,7 +74,8 @@ function user_validate(user){
             if(flag)
                 to_sync_users.push(user_to_sync);
 
-            //Actualisation de la liste "to_paste_users" et "to_sync_users"            chrome.storage.local.set({ "to_sync_users": to_sync_users }, null);
+             //Actualisation de la liste "to_paste_users" et "to_sync_users"
+            chrome.storage.local.set({ "to_sync_users": to_sync_users }, null);
             chrome.storage.local.set({ "to_paste_users": to_paste_users }, null);
         }
       });
