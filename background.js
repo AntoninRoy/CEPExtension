@@ -24,15 +24,14 @@ chrome.runtime.onMessage.addListener(function(data, sender, sendResponse) {
  * @param {*} user 
  */
 function user_validate(user){
+    //Recuperation dans le storage local des adhérents initialisés "to_paste_users" et des adhérents à synchroniser "to_sync_users "
     chrome.storage.local.get(["to_sync_users","to_paste_users"], function(items){
-        
+        //Cas ou la liste des utilisateurs a synchroniser est vide
         if(items.to_sync_users == null || items.to_sync_users.length == 0){
-            //create to_sync_users array
-            const newAdherent = JSON.parse(user);
-            var newto_sync_users = [
-                newAdherent
-            ];
+            //recuperation de l'user a ajouter et on l'ajoute directement dans un tableau
+            const newAdherent = [JSON.parse(user)];
 
+            //Boucle afin de supprimer l'user de la liste des éléments a copier
             var to_paste_users = items.to_paste_users;
             for(var i = 0; i < to_paste_users.length; i++)
             {
@@ -42,35 +41,41 @@ function user_validate(user){
                 }
             }
 
-            //Set value "to_sync_users" in chrome extension storage local 
-            chrome.storage.local.set({ "to_sync_users": newto_sync_users }, null);
+            //Actualisation de la liste "to_paste_users"
+            chrome.storage.local.set({ "to_sync_users": newAdherent }, null);
             chrome.storage.local.set({ "to_paste_users": to_paste_users }, null);
         }else{
-            var newto_sync_users = items.to_sync_users;
+            var to_sync_users = items.to_sync_users;
             var to_paste_users = items.to_paste_users;
-            //forEach loop to test if the adherent is not already in the to_sync_users array
+
+            //recuperation de l'user a ajouter
+            const user_to_sync = JSON.parse(user);
+
+            //Boucle afin de detecter si l'user n'est pas déja dans la liste des synchronisés
             let flag = true;
-            const newAdherent = JSON.parse(user);
-            newto_sync_users.forEach(function (element) {
-                if(element.id == newAdherent.id){
+            for(var i = 0; i < to_sync_users.length; i++)
+            {
+                const element = to_sync_users[i];
+                if(element.id == user_to_sync.id){
                     flag=false;
                 }
-            });
+            }
 
 
+            //Boucle afin de supprimer l'user de la liste des éléments a copier
             for(var i = 0; i < to_paste_users.length; i++)
             {
                 const element = to_paste_users[i];
-                if(element.id == newAdherent.id){
+                if(element.id == user_to_sync.id){
                     to_paste_users.splice(i,1);
                 }
             }
 
+            //si non présents dans la liste des synchronisés, on l'ajoute dans la liste
             if(flag)
-                newto_sync_users.push(newAdherent);
+                to_sync_users.push(user_to_sync);
 
-             //Set value "to_sync_users" in chrome extension storage local 
-            chrome.storage.local.set({ "to_sync_users": newto_sync_users }, null);
+            //Actualisation de la liste "to_paste_users" et "to_sync_users"            chrome.storage.local.set({ "to_sync_users": to_sync_users }, null);
             chrome.storage.local.set({ "to_paste_users": to_paste_users }, null);
         }
       });
